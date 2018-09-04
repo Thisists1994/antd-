@@ -32,3 +32,5 @@
 + `.webpackrc.js` 中的`publicPath`必须修改为实际用来做CDN的目录
 
 ## 其他使用规则，与官方版本完全一致
+
+React ES6代码规范 详见 /routes/Behaviour/Survey.js
