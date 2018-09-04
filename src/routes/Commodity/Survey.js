@@ -22,8 +22,10 @@ import DescriptionList from '../../components/DescriptionList';
 const FormItem = Form.Item;
 const { Description } = DescriptionList;
 const { MonthPicker, WeekPicker } = DatePicker;
-const Option = Select.Option;
-const TabPane = Tabs.TabPane;
+const { Option } = Select;
+const { TabPane } = Tabs;
+// const Option = Select.Option;
+// const TabPane = Tabs.TabPane;
 @Form.create()
 @connect(({ listGoodsData }) => ({
   listGoodsData,
@@ -45,35 +47,41 @@ export default class Survey extends Component {
 
   // 日期选择器
   onChange(_, date, type) {
-    let week = undefined;
-    let year = undefined;
-    let month = undefined;
-    const { getFieldsValue } = this.props.form;
-    const { dispatch } = this.props;
-    let formValue;
-    formValue = getFieldsValue();
+    let week = '';
+    let year = '';
+    let month = '';
+    let WeekArr = [];
+    const {
+      dispatch,
+      form: { getFieldsValue },
+    } = this.props;
+    // const { getFieldsValue } = this.props.form;
+    // const { dispatch } = this.props;
+    // let formValue;
+    const formValue = getFieldsValue();
     switch (type) {
       case 'day':
         dispatch({
           type: 'listGoodsData/getDay',
           payload: {
             date,
-            product: formValue.DateProduct == '全部' ? 0 : formValue.DateProduct,
-            platform: formValue.DatePlatform == '全平台' ? '' : formValue.DatePlatform,
+            product: formValue.DateProduct === '全部' ? 0 : formValue.DateProduct,
+            platform: formValue.DatePlatform === '全平台' ? '' : formValue.DatePlatform,
           },
         });
         break;
       case 'week':
-        let WeekArr = date.substring(0, 7).split('-');
-        year = WeekArr[0];
-        week = WeekArr[1];
+        WeekArr = date.substring(0, 7).split('-');
+        [year, week] = WeekArr;
+        // year = WeekArr[0];
+        // week = WeekArr[1];
         dispatch({
           type: 'listGoodsData/getWeek',
           payload: {
             year,
             week,
-            product: formValue.WeekProduct == '全部' ? 0 : formValue.WeekProduct,
-            platform: formValue.WeekPlatform == '全平台' ? '' : formValue.WeekPlatform,
+            product: formValue.WeekProduct === '全部' ? 0 : formValue.WeekProduct,
+            platform: formValue.WeekPlatform === '全平台' ? '' : formValue.WeekPlatform,
           },
         });
         break;
@@ -83,8 +91,8 @@ export default class Survey extends Component {
           type: 'listGoodsData/getMonth',
           payload: {
             month,
-            product: formValue.MonthProduct == '全部' ? 0 : formValue.MonthProduct,
-            platform: formValue.MonthPlatform == '全平台' ? '' : formValue.MonthPlatform,
+            product: formValue.MonthProduct === '全部' ? 0 : formValue.MonthProduct,
+            platform: formValue.MonthPlatform === '全平台' ? '' : formValue.MonthPlatform,
           },
         });
         break;
@@ -95,10 +103,14 @@ export default class Survey extends Component {
 
   // Tabs选择器
   callback = key => {
-    const { dispatch } = this.props;
-    const { getFieldsValue } = this.props.form;
-    let formValue;
-    formValue = getFieldsValue();
+    const {
+      dispatch,
+      form: { getFieldsValue },
+    } = this.props;
+    // const { dispatch } = this.props;
+    // const { getFieldsValue } = this.props.form;
+    // let formValue;
+    const formValue = getFieldsValue();
     console.log(formValue);
     switch (key) {
       case 'day':
@@ -109,8 +121,8 @@ export default class Survey extends Component {
           type: 'listGoodsData/getDay',
           payload: {
             date: moment(formValue.date).format('YYYY-MM-DD'),
-            product: formValue.DateProduct == '全部' ? 0 : formValue.DateProduct,
-            platform: formValue.DatePlatform == '全平台' ? '' : formValue.DatePlatform,
+            product: formValue.DateProduct === '全部' ? 0 : formValue.DateProduct,
+            platform: formValue.DatePlatform === '全平台' ? '' : formValue.DatePlatform,
           },
         });
         break;
@@ -123,8 +135,8 @@ export default class Survey extends Component {
           payload: {
             year: moment(formValue.weekDate).format('YYYY'),
             week: moment(formValue.weekDate).format('w'),
-            product: formValue.WeekProduct == '全部' ? 0 : formValue.WeekProduct,
-            platform: formValue.WeekPlatform == '全平台' ? '' : formValue.WeekPlatform,
+            product: formValue.WeekProduct === '全部' ? 0 : formValue.WeekProduct,
+            platform: formValue.WeekPlatform === '全平台' ? '' : formValue.WeekPlatform,
           },
         });
         break;
@@ -136,31 +148,36 @@ export default class Survey extends Component {
           type: 'listGoodsData/getMonth',
           payload: {
             month: moment(formValue.monthDate).format('YYYY-MM'),
-            product: formValue.MonthProduct == '全部' ? 0 : formValue.MonthProduct,
-            platform: formValue.MonthPlatform == '全平台' ? '' : formValue.MonthPlatform,
+            product: formValue.MonthProduct === '全部' ? 0 : formValue.MonthProduct,
+            platform: formValue.MonthPlatform === '全平台' ? '' : formValue.MonthPlatform,
           },
         });
         break;
-        default:
+      default:
         break;
     }
   };
 
   // 下拉选择器
   handleChange = (value, type) => {
-    const { getFieldsValue } = this.props.form;
-    const { dispatch } = this.props;
-    let formValue;
-    formValue = getFieldsValue();
-    switch (this.state.key) {
+    const {
+      dispatch,
+      form: { getFieldsValue },
+    } = this.props;
+    const { key } = this.state;
+    // const { getFieldsValue } = this.props.form;
+    // const { dispatch } = this.props;
+    // let formValue;
+    const formValue = getFieldsValue();
+    switch (key) {
       case 'day':
-        if (type == 'DateProduct') {
+        if (type === 'DateProduct') {
           dispatch({
             type: 'listGoodsData/getDay',
             payload: {
               date: moment(formValue.date).format('YYYY-MM-DD'),
               product: value,
-              platform: formValue.DatePlatform == '全平台' ? '' : formValue.DatePlatform,
+              platform: formValue.DatePlatform === '全平台' ? '' : formValue.DatePlatform,
             },
           });
         } else {
@@ -168,21 +185,21 @@ export default class Survey extends Component {
             type: 'listGoodsData/getDay',
             payload: {
               date: moment(formValue.date).format('YYYY-MM-DD'),
-              product: formValue.DateProduct == '全部' ? 0 : formValue.DateProduct,
-              platform: value == '全平台' ? '' : value,
+              product: formValue.DateProduct === '全部' ? 0 : formValue.DateProduct,
+              platform: value === '全平台' ? '' : value,
             },
           });
         }
         break;
       case 'week':
-        if (type == 'WeekProduct') {
+        if (type === 'WeekProduct') {
           dispatch({
             type: 'listGoodsData/getWeek',
             payload: {
               year: moment(formValue.weekDate).format('YYYY'),
               week: moment(formValue.weekDate).format('w'),
               product: value,
-              platform: formValue.WeekPlatform == '全平台' ? '' : formValue.WeekPlatform,
+              platform: formValue.WeekPlatform === '全平台' ? '' : formValue.WeekPlatform,
             },
           });
         } else {
@@ -191,20 +208,20 @@ export default class Survey extends Component {
             payload: {
               year: moment(formValue.weekDate).format('YYYY'),
               week: moment(formValue.weekDate).format('w'),
-              product: formValue.WeekProduct == '全部' ? 0 : formValue.WeekProduct,
-              platform: value == '全平台' ? '' : value,
+              product: formValue.WeekProduct === '全部' ? 0 : formValue.WeekProduct,
+              platform: value === '全平台' ? '' : value,
             },
           });
         }
         break;
       case 'month':
-        if (type == 'MonthProduct') {
+        if (type === 'MonthProduct') {
           dispatch({
             type: 'listGoodsData/getMonth',
             payload: {
               month: moment(formValue.monthDate).format('YYYY-MM'),
               product: value,
-              platform: formValue.MonthPlatform == '全平台' ? '' : formValue.MonthPlatform,
+              platform: formValue.MonthPlatform === '全平台' ? '' : formValue.MonthPlatform,
             },
           });
         } else {
@@ -212,28 +229,32 @@ export default class Survey extends Component {
             type: 'listGoodsData/getMonth',
             payload: {
               month: moment(formValue.monthDate).format('YYYY-MM'),
-              product: formValue.MonthProduct == '全部' ? 0 : formValue.MonthProduct,
-              platform: value == '全平台' ? '' : value,
+              product: formValue.MonthProduct === '全部' ? 0 : formValue.MonthProduct,
+              platform: value === '全平台' ? '' : value,
             },
           });
         }
         break;
-        default:
+      default:
         break;
     }
   };
 
   render() {
     const { date, weekDate, monthDate } = this.state;
-    const { getFieldDecorator } = this.props.form;
-    const { dispatch, listGoodsData } = this.props;
+    const {
+      listGoodsData,
+      form: { getFieldDecorator },
+    } = this.props;
+    // const { getFieldDecorator } = this.props.form;
+    // const { dispatch, listGoodsData } = this.props;
     const onlineCountArr = []; // 在架商品数
     const visitCountArr = []; // 被访问商品数
     const pageviewPvArr = []; // 商品浏览量
-    const visitUVArr = []; //商品访客数
-    const payGoodsCountArr = []; //付款商品数
-    if (typeof listGoodsData != 'undefined') {
-      for (let i = 0; i < listGoodsData.goodsSummaryEcharts.length; i++) {
+    const visitUVArr = []; // 商品访客数
+    const payGoodsCountArr = []; // 付款商品数
+    if (typeof listGoodsData !== 'undefined') {
+      for (let i = 0; i < listGoodsData.goodsSummaryEcharts.length; i = 1 + i) {
         onlineCountArr.push(listGoodsData.goodsSummaryEcharts[i].onlineCount);
         visitCountArr.push(listGoodsData.goodsSummaryEcharts[i].visitCount);
         pageviewPvArr.push(listGoodsData.goodsSummaryEcharts[i].pageviewPv);
@@ -331,7 +352,7 @@ export default class Survey extends Component {
       },
     ];
     const dataSource = listGoodsData.goodsSummaryEcharts;
-    for (let i = 0; i < listGoodsData.goodsSummaryEcharts.length; i++) {
+    for (let i = 0; i < listGoodsData.goodsSummaryEcharts.length; i = 1 + i) {
       listGoodsData.goodsSummaryEcharts[i].key = i;
     }
     const visitToPay = (listGoodsData.goodsSummart.visitToPay * 100).toFixed(2) + '%';
