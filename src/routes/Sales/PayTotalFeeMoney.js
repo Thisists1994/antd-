@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
-import PageHeaderLayout from '../../layouts/PageHeaderLayout';
 import ReactEcharts from 'echarts-for-react';
 import { Card, Tabs, DatePicker, Select, Row, Col, Form, Table } from 'antd';
+import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+
 const FormItem = Form.Item;
 const { MonthPicker, WeekPicker } = DatePicker;
-const Option = Select.Option;
-const TabPane = Tabs.TabPane;
+// const Option = Select.Option;
+const { TabPane } = Tabs;
 @Form.create()
 @connect(({ listPaymentData }) => ({
   listPaymentData,
@@ -18,11 +19,57 @@ export default class PayTotalFeeMoney extends Component {
     weekDate: moment().add(-1, 'week'),
     monthDate: moment().add(-1, 'month'),
   };
+
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch({
       type: 'listPaymentData/getDay',
     });
+  }
+
+  // 日期选择器
+  onChange(_, date, type) {
+    let week = '';
+    let year = '';
+    let month = '';
+    let WeekArr = [];
+    const { dispatch } = this.props;
+    console.log(type);
+    console.log(date);
+    switch (type) {
+      case 'day':
+        dispatch({
+          type: 'listPaymentData/getDay',
+          payload: {
+            date,
+          },
+        });
+        break;
+      case 'week':
+        WeekArr = date.substring(0, 7).split('-');
+        // year = WeekArr[0];
+        [year, week] = WeekArr;
+        console.log(year);
+        console.log(week);
+        // week = WeekArr[1];
+        dispatch({
+          type: 'listPaymentData/getWeek',
+          payload: {
+            year,
+            week,
+          },
+        });
+        break;
+      case 'month':
+        month = date;
+        dispatch({
+          type: 'listPaymentData/getMonth',
+          payload: {
+            month,
+          },
+        });
+        break;
+    }
   }
 
   // Tabs选择器
@@ -47,58 +94,20 @@ export default class PayTotalFeeMoney extends Component {
     }
   };
 
-  // 日期选择器
-  onChange(_, date, type) {
-    let week = undefined;
-    let year = undefined;
-    let month = undefined;
-    const { dispatch } = this.props;
-    console.log(type);
-    console.log(date);
-    switch (type) {
-      case 'day':
-        dispatch({
-          type: 'listPaymentData/getDay',
-          payload: {
-            date,
-          },
-        });
-        break;
-      case 'week':
-        let WeekArr = date.substring(0, 7).split('-');
-        year = WeekArr[0];
-        week = WeekArr[1];
-        dispatch({
-          type: 'listPaymentData/getWeek',
-          payload: {
-            year,
-            week,
-          },
-        });
-        break;
-      case 'month':
-        month = date;
-        dispatch({
-          type: 'listPaymentData/getMonth',
-          payload: {
-            month,
-          },
-        });
-        break;
-    }
-  }
-  // 下拉选择器
-  handleChange(value) {
-    console.log(`selected ${value}`);
-  }
+  // 下拉选择器 (暂时没用到)
+  // handleChange(value) {
+  //   console.log(`selected ${value}`);
+  // }
+
   // 转换新数组
-  convertKey(arr, key) {
-    let newArr = [];
-    arr.forEach((item, index) => {
-      let newObj = {};
+  convertKey = (arr, key) => {
+    const newArr = [];
+    arr.forEach(item => {
+      const newObj = {};
       newObj[key[0]] = item[Object.keys(item)[0]];
       newObj[key[1]] =
-        item[Object.keys(item)[1]] + '\t\t(' + (item[Object.keys(item)[2]] * 100).toFixed(2) + '%)';
+        // item[Object.keys(item)[1]] + '\t\t(' + (item[Object.keys(item)[2]] * 100).toFixed(2) + '%)'; // 需要转成模板字符串
+        `${item[Object.keys(item)[1]]}\t\t(${(item[Object.keys(item)[2]] * 100).toFixed(2)}%)`;
       newObj[key[2]] =
         item[Object.keys(item)[3]] + '\t\t(' + (item[Object.keys(item)[4]] * 100).toFixed(2) + '%)';
       newObj[key[3]] =
@@ -107,10 +116,11 @@ export default class PayTotalFeeMoney extends Component {
       newArr.push(newObj);
     });
     return newArr;
-  }
-  convertKey2(obj, key) {
+  };
+
+  convertKey2 = (obj, key) => {
     // let newArr = [];
-    let newObj = {};
+    const newObj = {};
     newObj[key[0]] = '总计';
     newObj[key[1]] =
       obj[Object.keys(obj)[0]] + '\t\t(' + (obj[Object.keys(obj)[1]] * 100).toFixed(2) + '%)';
@@ -120,18 +130,20 @@ export default class PayTotalFeeMoney extends Component {
       obj[Object.keys(obj)[4]] + '\t\t(' + (obj[Object.keys(obj)[5]] * 100).toFixed(2) + '%)';
     newObj[key[4]] = obj[Object.keys(obj)[6]];
     return newObj;
-  }
+  };
 
   render() {
     const { date, weekDate, monthDate } = this.state;
-    const { getFieldDecorator, getFieldValue } = this.props.form;
+    const {
+      form: { getFieldDecorator },
+    } = this.props;
     const { listPaymentData } = this.props;
 
     const appMoneyArr = []; // APP付款金额
     const weChatMoneyArr = []; // 公众号付款金额
     const appletMoneyArr = []; // 小程序付款金额
-    if (typeof listPaymentData != 'undefined') {
-      for (let i = 0; i < listPaymentData.paymentEcharts.length; i++) {
+    if (typeof listPaymentData !== 'undefined') {
+      for (let i = 0; i < listPaymentData.paymentEcharts.length; i = 1 + i) {
         appMoneyArr.push(listPaymentData.paymentEcharts[i].appMoney);
         weChatMoneyArr.push(listPaymentData.paymentEcharts[i].weChatMoney);
         appletMoneyArr.push(listPaymentData.paymentEcharts[i].appletMoney);
@@ -219,14 +231,14 @@ export default class PayTotalFeeMoney extends Component {
         dataIndex: 'dateMoney',
       },
     ];
-    let dataSource = this.convertKey(listPaymentData.paymentEcharts, [
+    const dataSource = this.convertKey(listPaymentData.paymentEcharts, [
       'eventDate',
       'app',
       'wechat',
       'applet',
       'dateMoney',
     ]);
-    let totalTabel = this.convertKey2(listPaymentData.totalTabel, [
+    const totalTabel = this.convertKey2(listPaymentData.totalTabel, [
       'eventDate',
       'app',
       'wechat',
@@ -234,7 +246,7 @@ export default class PayTotalFeeMoney extends Component {
       'dateMoney',
     ]);
     dataSource.push(totalTabel);
-    for (let i = 0; i < dataSource.length; i++) {
+    for (let i = 0; i < dataSource.length; i = 1 + i) {
       dataSource[i].key = i;
     }
     return (

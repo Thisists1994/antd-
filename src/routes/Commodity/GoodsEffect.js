@@ -4,7 +4,7 @@ import { Link } from 'dva/router';
 import { Avatar, Card, Tabs, DatePicker, Select, Row, Col, Input, Form, Table, Button } from 'antd';
 import moment from 'moment';
 import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import DescriptionList from '../../components/DescriptionList';
+// import DescriptionList from '../../components/DescriptionList';
 
 const FormItem = Form.Item;
 // const { Description } = DescriptionList;
@@ -47,7 +47,8 @@ export default class GoodsEffect extends Component {
       };
       console.log(values);
       // this.state.key
-      switch (this.state.key) {
+      const { key } = this.state;
+      switch (key) {
         case 'day':
           dispatch({
             type: 'goodsEffect/getDay',
@@ -56,7 +57,7 @@ export default class GoodsEffect extends Component {
               product: values.DateProduct === '全部' ? 0 : values.DateProduct,
               platform: values.DatePlatform === '全平台' ? '' : values.DatePlatform,
               search: values.id,
-              page: page,
+              page: page ? 1 : page,
             },
           });
           break;
@@ -212,7 +213,10 @@ export default class GoodsEffect extends Component {
       fetching,
     } = this.props;
     const { date, weekDate, monthDate } = this.state;
-    const { getFieldDecorator } = this.props.form;
+    // const { getFieldDecorator } = this.props.form;
+    const {
+      form: { getFieldDecorator },
+    } = this.props;
     // 构建自己的翻页器
     const paginationProps = {
       showSizeChanger: true,
@@ -222,7 +226,7 @@ export default class GoodsEffect extends Component {
       current: pagination ? pagination.current : 1,
       onChange: this.onPageChange,
     };
-    for (let i = 0; i < goodsDetails.length; i++) {
+    for (let i = 0; i < goodsDetails.length; i = 1 + i) {
       goodsDetails[i].key = i;
     }
     const dataSource = goodsDetails;
@@ -251,7 +255,7 @@ export default class GoodsEffect extends Component {
         dataIndex: 'visitCount',
         key: 'visitCount',
         align: 'center',
-        sorter: true,
+        // sorter: true,
         defaultSortOrder: 'descend', // 设置默认排序顺序
         sorter: (a, b) => a.visitCount - b.visitCount, // 对数据进行排序
       },
@@ -407,7 +411,7 @@ export default class GoodsEffect extends Component {
                       })(
                         <Select
                           style={{ width: 120 }}
-                          onChange={(value, type) => this.handleChange(value, 'WeekProduct')}
+                          onChange={(value) => this.handleChange(value, 'WeekProduct')}
                         >
                           <Option value="0">全部</Option>
                           <Option value="2">幸福场</Option>
@@ -482,7 +486,7 @@ export default class GoodsEffect extends Component {
                       })(
                         <Select
                           style={{ width: 120 }}
-                          onChange={(value, type) => this.handleChange(value, 'MonthProduct')}
+                          onChange={(value) => this.handleChange(value, 'MonthProduct')}
                         >
                           <Option value="0">全部</Option>
                           <Option value="2">幸福场</Option>

@@ -46,6 +46,7 @@ module.exports = {
     'no-bitwise': [0],
     'no-cond-assign': [0],
     'import/no-unresolved': [0],
+    'linebreak-style': [0, 'error', 'windows'],
     'comma-dangle': [
       'error',
       {
@@ -60,6 +61,8 @@ module.exports = {
     'function-paren-newline': [0],
     'no-restricted-globals': [0],
     'require-yield': [1],
+    'no-console': 0,
+    'default-case': 0,
   },
   parserOptions: {
     ecmaFeatures: {

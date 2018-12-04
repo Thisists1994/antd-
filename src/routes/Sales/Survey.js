@@ -1,14 +1,11 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'dva';
 import moment from 'moment';
-import PageHeaderLayout from '../../layouts/PageHeaderLayout';
-import DescriptionList from '../../components/DescriptionList';
-import ReactEcharts from 'echarts-for-react';
 import {
   Card,
   Tabs,
   DatePicker,
-  Select,
+  // Select,
   Row,
   Col,
   Divider,
@@ -18,11 +15,15 @@ import {
   Table,
   Button,
 } from 'antd';
-import { Link } from 'dva/router';
+import ReactEcharts from 'echarts-for-react';
+import PageHeaderLayout from '../../layouts/PageHeaderLayout';
+import DescriptionList from '../../components/DescriptionList';
+
+// import { Link } from 'dva/router';
 const FormItem = Form.Item;
 const { Description } = DescriptionList;
 const { MonthPicker, WeekPicker } = DatePicker;
-const { Option } = Select;
+// const { Option } = Select;
 const { TabPane } = Tabs;
 @Form.create()
 @connect(({ listData }) => ({
@@ -44,9 +45,10 @@ export default class Survey extends Component {
 
   // 日期选择器
   onChange(_, date, type) {
-    let week = undefined;
-    let year = undefined;
-    let month = undefined;
+    let week = '';
+    let year = '';
+    let month = '';
+    let WeekArr = [];
     const { dispatch } = this.props;
     console.log(type);
     switch (type) {
@@ -59,9 +61,10 @@ export default class Survey extends Component {
         });
         break;
       case 'week':
-        let WeekArr = date.substring(0, 7).split('-');
-        year = WeekArr[0];
-        week = WeekArr[1];
+        WeekArr = date.substring(0, 7).split('-');
+        [year, week] = WeekArr;
+        // year = WeekArr[0];
+        // week = WeekArr[1];
         dispatch({
           type: 'listData/getWeek',
           payload: {
@@ -115,14 +118,16 @@ export default class Survey extends Component {
 
   render() {
     const { date, weekDate, monthDate } = this.state;
-    const { getFieldDecorator, getFieldValue } = this.props.form;
+    const {
+      form: { getFieldDecorator },
+    } = this.props;
     const { listData } = this.props;
     const payUserCountArr = []; // 付款人数
     const payTotalFeeMoneyArr = []; // 付款金额
     const payGoodsCountArr = []; // 付款件数
-    const payOrderCountArr = []; //付款订单数
-    if (typeof listData != 'undefined') {
-      for (let i = 0; i < listData.paySummaryEcharts.length; i++) {
+    const payOrderCountArr = []; // 付款订单数
+    if (typeof listData !== 'undefined') {
+      for (let i = 0; i < listData.paySummaryEcharts.length; i = 1 + i) {
         payUserCountArr.push(listData.paySummaryEcharts[i].payUserCount);
         payTotalFeeMoneyArr.push(listData.paySummaryEcharts[i].payTotalFeeMoney);
         payGoodsCountArr.push(listData.paySummaryEcharts[i].payGoodsCount);
@@ -209,13 +214,15 @@ export default class Survey extends Component {
       },
     ];
     const dataSource = listData.paySummaryEcharts;
-    for (let i = 0; i < listData.paySummaryEcharts.length; i++) {
+    for (let i = 0; i < listData.paySummaryEcharts.length; i = 1 + i) {
       listData.paySummaryEcharts[i].key = i;
     }
     const visitUnitPrice = parseFloat(listData.orderSummary.visitUnitPrice).toFixed(2);
-    const visitToConfirm = (listData.orderSummary.visitToCreate * 100).toFixed(2) + '%';
-    const createToPay = (listData.orderSummary.createToPay * 100).toFixed(2) + '%';
-    const visitToPay = (listData.orderSummary.visitToPay * 100).toFixed(2) + '%';
+    const visitToConfirm = `${(listData.orderSummary.visitToCreate * 100).toFixed(2)}%`;
+    const createToPay = `${(listData.orderSummary.createToPay * 100).toFixed(2)}%`;
+    const visitToPay = `${(listData.orderSummary.visitToPay * 100).toFixed(2)}%`;
+
+    // 下载地址
     const extraContent = (
       <Fragment>
         <Button
